@@ -8,7 +8,7 @@ public class Seek : MonoBehaviour
     public GameObject floor;
     public float moveSpeed = 2f, rotSpeed = 3f;
     [SerializeField] Vector3 destination;
-    [SerializeField] bool destinationSet = false, checking = false, gotAngle = false;
+    [SerializeField] bool destinationSet = false, checking = false, init = true;
     [SerializeField] float timer;
     [SerializeField] float randomAngle = 0f;
 
@@ -23,6 +23,7 @@ public class Seek : MonoBehaviour
             timer = 0.0f;
             destination = SetDestination(floor);
             destinationSet = true;
+            init = true;
         }
         
         if (destinationSet && !checking){
@@ -31,18 +32,13 @@ public class Seek : MonoBehaviour
         
         if (destinationSet && CheckPosition(destination)){
             checking = true;
-            if (!gotAngle){
-                randomAngle = Random.Range(-180f, 180f);
-                gotAngle = true;
-            }
-            else{
-                Quaternion desiredRotation = Quaternion.Euler(0.0f, randomAngle, 0.0f);
-                transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, 5f * Time.deltaTime);
-            }
+            if (init)
+                init = CheckAround(init);
+            else
+                CheckAround(init);
             timer += Time.deltaTime;
             if (timer >= maxCheck){
                 checking = false;
-                gotAngle = false;
                 destinationSet = false;
             }
         }
@@ -75,8 +71,14 @@ public class Seek : MonoBehaviour
         }
     }
 
-    //public void CheckAround(){
-        // Seeker will look around at a random spot over 5 seconds
-        
-    //}
+    public bool CheckAround(bool init){
+        // Seeker will look around at a random spot
+        if (init){
+                randomAngle = Random.Range(-180f, 180f);
+        } else{
+            Quaternion desiredRotation = Quaternion.Euler(0.0f, randomAngle, 0.0f);
+            transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, 5f * Time.deltaTime);
+        }
+        return false;
+    }
 }
