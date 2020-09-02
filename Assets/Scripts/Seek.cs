@@ -16,7 +16,7 @@ public class Seek : MonoBehaviour
     }
 
     void Update(){
-        float maxCheck = 5.0f;
+        float maxCheck = 10.0f;
         
         // Set a random destination
         if (!destinationSet){
@@ -26,20 +26,30 @@ public class Seek : MonoBehaviour
             init = true;
         }
         
+        // Move to destination
         if (destinationSet && !checking){
             MoveToDestination(destination);
         }
         
+        // Check surroundings for 10 seconds and then find new destination
         if (destinationSet && CheckPosition(destination)){
             checking = true;
+
+            // Initalize finding a random angle to check
             if (init)
                 init = CheckAround(init);
             else
                 CheckAround(init);
+
             timer += Time.deltaTime;
-            if (timer >= maxCheck){
+            // After 10 seconds, go to a new destination
+            if (timer > maxCheck){
                 checking = false;
                 destinationSet = false;
+                
+            // Look around every 2 seconds
+            } else if (Mathf.Floor(timer) % 2.0f != 0.0f){
+                init = true;
             }
         }
     }
