@@ -1377,6 +1377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7a58f3f53dabc04695e264ac0e81141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  grid: {fileID: 1607382685}
   floor: {fileID: 884212490}
   moveSpeed: 2
   rotSpeed: 3
@@ -1660,11 +1661,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74f0d99a6b9d9f64bb373afc49958411, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seeker: {fileID: 1394524333}
   plane: {fileID: 884212490}
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 256
+  seeker: {fileID: 0}
   gridSize: {x: 0, y: 0, z: 0}
   nodeRadius: 0
   nodeDiameter: 0
