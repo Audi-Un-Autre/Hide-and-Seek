@@ -33,8 +33,14 @@ public class Seek : MonoBehaviour
         if (!destinationSet){
             timer = 0.0f;
             destination = SetDestination(floor);
-            destinationSet = true;
-            pathfinding = true;
+            Node tempDestination = grid.PointOnGrid(destination);
+            if (tempDestination.isHidden || tempDestination.isObstacle){
+                destination = SetDestination(floor);
+            }
+            else{
+                destinationSet = true;
+                pathfinding = true;
+            }
         }
 
         // Pathfind
@@ -84,7 +90,7 @@ public class Seek : MonoBehaviour
             }
             
             foreach (Node neighbour in grid.GetNeighbours(currentNode)){
-                if (neighbour.isObstacle || closedSet.Contains(neighbour)){
+                if (neighbour.isObstacle || neighbour.isHidden || closedSet.Contains(neighbour)){
                     continue;
                 }
 

@@ -5,8 +5,7 @@ using UnityEngine;
 public class Grid : MonoBehaviour{
 
     public GameObject plane;
-    public LayerMask ObstacleMask;
-    public GameObject seeker;
+    public LayerMask ObstacleMask, HiddenMask;
     [SerializeField] Vector3 gridSize;
     [SerializeField] float nodeRadius;
     Node[,] grid;
@@ -16,7 +15,7 @@ public class Grid : MonoBehaviour{
 
     void Start(){
         gridSize = plane.GetComponent<MeshCollider>().bounds.size;
-        nodeDiameter = .5f;
+        nodeDiameter = .75f;
         nodeRadius = nodeDiameter / 2f;
 
         gridX = Mathf.RoundToInt(gridSize.x / nodeDiameter);
@@ -39,7 +38,8 @@ public class Grid : MonoBehaviour{
                 // Point on grid that represents a 'node'. From the bottom left of the grid we move 1 unit to the right per loop and then 1 unit up after hitting x limit.
                 Vector3 worldPoint = gridBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (z * nodeDiameter + nodeRadius);
                 bool isObstacle = Physics.CheckSphere(worldPoint, nodeRadius, ObstacleMask);
-                grid[x,z] = new Node(isObstacle, worldPoint, x, z);
+                bool isHidden = Physics.CheckSphere(worldPoint, nodeRadius, HiddenMask);
+                grid[x,z] = new Node(isObstacle, isHidden, worldPoint, x, z);
             }
         }
     }
