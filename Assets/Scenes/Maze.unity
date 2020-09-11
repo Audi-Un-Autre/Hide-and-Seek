@@ -629,6 +629,7 @@ GameObject:
   - component: {fileID: 582502608}
   - component: {fileID: 582502607}
   - component: {fileID: 582502606}
+  - component: {fileID: 582502610}
   m_Layer: 0
   m_Name: Hider
   m_TagString: Hidden
@@ -644,7 +645,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 582502605}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -710,6 +711,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &582502610
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 582502605}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &703642975
 GameObject:
   m_ObjectHideFlags: 0
@@ -722,6 +739,7 @@ GameObject:
   - component: {fileID: 703642978}
   - component: {fileID: 703642977}
   - component: {fileID: 703642976}
+  - component: {fileID: 703642980}
   m_Layer: 0
   m_Name: Hider
   m_TagString: Hidden
@@ -737,7 +755,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 703642975}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -803,6 +821,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &703642980
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703642975}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &882714736
 GameObject:
   m_ObjectHideFlags: 0
@@ -1002,6 +1036,7 @@ GameObject:
   - component: {fileID: 1160294641}
   - component: {fileID: 1160294640}
   - component: {fileID: 1160294639}
+  - component: {fileID: 1160294643}
   m_Layer: 0
   m_Name: Hider
   m_TagString: Hidden
@@ -1017,7 +1052,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1160294638}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -1083,6 +1118,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1160294643
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1160294638}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1293859795
 GameObject:
   m_ObjectHideFlags: 0
@@ -1284,6 +1335,8 @@ GameObject:
   - component: {fileID: 1394524335}
   - component: {fileID: 1394524336}
   - component: {fileID: 1394524337}
+  - component: {fileID: 1394524334}
+  - component: {fileID: 1394524338}
   m_Layer: 0
   m_Name: Seeker
   m_TagString: Untagged
@@ -1299,7 +1352,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1394524329}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -1365,6 +1418,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1394524334
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394524329}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!114 &1394524335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1377,6 +1446,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7a58f3f53dabc04695e264ac0e81141, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mSeek: {fileID: 2100000, guid: d57185d78d4c13c439607b5155e395cb, type: 2}
+  mHide: {fileID: 2100000, guid: 77c6fa58e0d49c44e84081fcdcf4f83b, type: 2}
   grid: {fileID: 1607382685}
   floor: {fileID: 884212490}
   moveSpeed: 2
@@ -1384,10 +1455,10 @@ MonoBehaviour:
   destination: {x: 0, y: 0, z: 0}
   destinationSet: 0
   pathfinding: 0
-  moving: 0
   checkingDone: 0
-  hide: 0
   atSpot: 0
+  moving: 0
+  hide: 0
   timer: 0
   randomAngle: 0
   targetPosition: {x: 0, y: 0, z: 0}
@@ -1495,6 +1566,18 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1394524338
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1394524329}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d402887fa8cf7c4419ea1ed9dd46244c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1487739776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1835,6 +1918,7 @@ GameObject:
   - component: {fileID: 2007382562}
   - component: {fileID: 2007382561}
   - component: {fileID: 2007382560}
+  - component: {fileID: 2007382564}
   m_Layer: 0
   m_Name: Hider
   m_TagString: Hidden
@@ -1850,7 +1934,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2007382559}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
@@ -1916,6 +2000,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &2007382564
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007382559}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &2098179501
 GameObject:
   m_ObjectHideFlags: 0

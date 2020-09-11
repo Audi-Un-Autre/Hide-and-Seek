@@ -5,19 +5,22 @@ using UnityEngine;
 public class Seek : MonoBehaviour
 {
     public enum SeekerState{Wander, Chase, Hide}
-    private SeekerState _currentState;
-    private Plane[] geoPlanes;
-    Camera cam;
+    public Material mSeek, mHide;
     public Grid grid;
     public GameObject floor;
     public float moveSpeed = 2f, rotSpeed = 3f;
+    public bool moving, hide;
+    public List<Node> path = new List<Node>();
+    public Coroutine movement;
+
+    private SeekerState _currentState;
+    private Plane[] geoPlanes;
+    private Vector3 hiddenDestination;
+
     [SerializeField] Vector3 destination;
-    [SerializeField] bool destinationSet, pathfinding, moving, checkingDone, hide, atSpot;
+    [SerializeField] bool destinationSet, pathfinding, checkingDone, atSpot;
     [SerializeField] float timer;
     [SerializeField] float randomAngle = 0f;
-    public List<Node> path = new List<Node>();
-    Coroutine movement;
-    private Vector3 hiddenDestination;
     [SerializeField] Vector3 targetPosition;
 
     void Start(){
@@ -31,7 +34,7 @@ public class Seek : MonoBehaviour
         moving = true;
         hide = false;
 
-        cam = GetComponent<Camera>();
+        gameObject.GetComponent<Renderer>().material.color = mSeek.color;
     }
 
     void Update(){
@@ -88,6 +91,7 @@ public class Seek : MonoBehaviour
 
             // In this state, go to target until collision, once colliding this seeker will 
             case SeekerState.Chase:{
+                moveSpeed = 3f;
                 Debug.Log("CURRENT STATE : CHASE.");
                 if (hide){
                     _currentState = SeekerState.Hide;
@@ -100,9 +104,7 @@ public class Seek : MonoBehaviour
                             moving = false;
                         }
                     }
-                } break;
-            }
-/*
+
                     //trace path made
                     if (!moving){
                         movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
@@ -111,9 +113,11 @@ public class Seek : MonoBehaviour
                 }
                 break;
             }
-            /*
+
             // In this state, go to a random location, become hidden and remove the properties of a seeker
             case SeekerState.Hide:{
+                moveSpeed = 3.5f;
+                Debug.Log("CURRENT STATE : HIDE");
                 if (!destinationSet){
                         destination = SetDestination(floor);
                         Node tempDestination = grid.PointOnGrid(destination);
@@ -125,7 +129,7 @@ public class Seek : MonoBehaviour
                             pathfinding = true;
                         }
                     }
-
+                    
                 // Pathfind
                 if (pathfinding){
                     pathfinding = Pathfind(transform.position, destination);
@@ -140,12 +144,12 @@ public class Seek : MonoBehaviour
                 }
 
                 if (atSpot){
-                    Material hiddenMaterial = Resources.Load("Materials/hiderMaterial", typeof(Material)) as Material;
-                    gameObject.GetComponent<Renderer>().material = hiddenMaterial;
+                    gameObject.GetComponent<Renderer>().material.color = mHide.color;
+                    Destroy(GetComponent<Seek>());
                 }
 
                 break;
-            }*/
+            }
         }
     }
 
@@ -229,6 +233,7 @@ public class Seek : MonoBehaviour
                 Vector3 direction = (c.transform.position - transform.position).normalized;
                 if (Physics.Raycast(transform.position, direction, out hit)){
                     if (hit.transform.gameObject.tag == "Hidden"){
+                        targetPosition = hit.transform.position;
                         Debug.Log("Found a hidden player.");
                         return true;
                     } else {
@@ -293,8 +298,7 @@ public class Seek : MonoBehaviour
                     }
                     yield return null;
                 }
-            }
-            if (hide){
+            } else if (state == SeekerState.Hide && n == lastNode){
                 atSpot = true;
             }
         }
@@ -311,17 +315,7 @@ public class Seek : MonoBehaviour
         return false;
     }
 
-    private void OnTriggerEnter(Collider o){
-        if (o.GetComponent<Collider>().tag == "Hidden"){
-            Debug.Log("Tagged a hidden player. Time to hide!");
-            if (moving){
-                StopCoroutine(movement);
-                targetPosition = o.transform.position;
-                hide = true;
-            }
-        }
-    }
-
+    // OVERLAYSPHERE VISUAL DEBUGGING
     private void OnDrawGizmos(){
         Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, 10f);

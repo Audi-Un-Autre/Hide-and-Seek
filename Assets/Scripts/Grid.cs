@@ -79,7 +79,7 @@ public class Grid : MonoBehaviour{
     }
 
     public List<Node> path;
-    
+     //VISUAL DEBUGGING
     private void OnDrawGizmos(){
         Gizmos.DrawWireCube(transform.position, new Vector3(gridSize.x, 1, gridSize.z));
         if (grid != null){
