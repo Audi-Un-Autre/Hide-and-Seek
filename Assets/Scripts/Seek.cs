@@ -4,16 +4,21 @@ using UnityEngine;
 
 public class Seek : MonoBehaviour
 {
-    
+    public enum SeekerState{Wander, Chase, Hide}
+    private SeekerState _currentState;
+    private Plane[] geoPlanes;
+    Camera cam;
     public Grid grid;
     public GameObject floor;
     public float moveSpeed = 2f, rotSpeed = 3f;
     [SerializeField] Vector3 destination;
-    [SerializeField] bool destinationSet, pathfinding, moving, checkingDone;
+    [SerializeField] bool destinationSet, pathfinding, moving, checkingDone, hide, atSpot;
     [SerializeField] float timer;
     [SerializeField] float randomAngle = 0f;
     public List<Node> path = new List<Node>();
     Coroutine movement;
+    private Vector3 hiddenDestination;
+    [SerializeField] Vector3 targetPosition;
 
     void Start(){
         // Stay in Scene View
@@ -21,47 +26,126 @@ public class Seek : MonoBehaviour
 
         // Set initial destination for Gizmos
         destination = SetDestination(floor);
-        destinationSet = true;
-        pathfinding = true;
+        destinationSet = false;
         checkingDone = false;
         moving = true;
+        hide = false;
+
+        cam = GetComponent<Camera>();
     }
 
     void Update(){
-        
-        // Set a random destination
-        if (!destinationSet){
-            timer = 0.0f;
-            destination = SetDestination(floor);
-            Node tempDestination = grid.PointOnGrid(destination);
-            if (tempDestination.isHidden || tempDestination.isObstacle){
-                destination = SetDestination(floor);
-            }
-            else{
-                destinationSet = true;
-                pathfinding = true;
-            }
-        }
+        // Basic State Machine
+        switch(_currentState){
+            case SeekerState.Wander:{
+                Debug.Log("CURRENT STATE : WANDER.");
+                if (CheckForHidden()){
+                    StopCoroutine(movement);
+                    pathfinding = true;
+                    destinationSet = false;
+                    moving = false;
+                    checkingDone = false;
+                    _currentState = SeekerState.Chase;
+                } else {
 
-        // Pathfind
-        if (pathfinding){
-            pathfinding = Pathfind(transform.position, destination);
-            if (!pathfinding)
-                moving = false;
-        }
+                    // set destination
+                    if (!destinationSet){
+                        timer = 0.0f;
+                        destination = SetDestination(floor);
+                        Node tempDestination = grid.PointOnGrid(destination);
+                        if (tempDestination.isObstacle){
+                            destination = SetDestination(floor);
+                        }
+                        else{
+                            destinationSet = true;
+                            pathfinding = true;
+                        }
+                    }
 
-        // Trace path made
-        if (!moving){
-            movement = StartCoroutine(MoveToDestination(grid.path));
-            moving = true;
-        }
-        
-        // At last node of path and finished checking around, reset all bools and start new destination
-        if (checkingDone){
-            StopCoroutine(movement);
-            pathfinding = false;
-            destinationSet = false;
-            checkingDone = false;
+                    // Pathfind to destination
+                    if (pathfinding){
+                        pathfinding = Pathfind(transform.position, destination);
+                        if (!pathfinding)
+                            moving = false;
+                    }
+
+                    // Trace path made
+                    if (!moving){
+                        movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
+                        moving = true;
+                    }
+                    
+                    // At last node of path and finished checking around, reset all bools and start new destination
+                    if (checkingDone){
+                        StopCoroutine(movement);
+                        pathfinding = false;
+                        destinationSet = false;
+                        checkingDone = false;
+                    }
+                }
+                break;
+            }
+
+            // In this state, go to target until collision, once colliding this seeker will 
+            case SeekerState.Chase:{
+                Debug.Log("CURRENT STATE : CHASE.");
+                if (hide){
+                    _currentState = SeekerState.Hide;
+                } else {
+
+                    //pathfind to hidden player
+                    if (pathfinding){
+                        pathfinding = Pathfind(transform.position, ChaseDestination(targetPosition));
+                        if (!pathfinding){
+                            moving = false;
+                        }
+                    }
+                } break;
+            }
+/*
+                    //trace path made
+                    if (!moving){
+                        movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
+                        moving = true;
+                    }
+                }
+                break;
+            }
+            /*
+            // In this state, go to a random location, become hidden and remove the properties of a seeker
+            case SeekerState.Hide:{
+                if (!destinationSet){
+                        destination = SetDestination(floor);
+                        Node tempDestination = grid.PointOnGrid(destination);
+                        if (tempDestination.isObstacle){
+                            destination = SetDestination(floor);
+                        }
+                        else{
+                            destinationSet = true;
+                            pathfinding = true;
+                        }
+                    }
+
+                // Pathfind
+                if (pathfinding){
+                    pathfinding = Pathfind(transform.position, destination);
+                    if (!pathfinding)
+                        moving = false;
+                }
+
+                // Trace path made
+                if (!moving){
+                    movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
+                    moving = true;
+                }
+
+                if (atSpot){
+                    Material hiddenMaterial = Resources.Load("Materials/hiderMaterial", typeof(Material)) as Material;
+                    gameObject.GetComponent<Renderer>().material = hiddenMaterial;
+                }
+
+                break;
+            }*/
         }
     }
 
@@ -90,7 +174,7 @@ public class Seek : MonoBehaviour
             }
             
             foreach (Node neighbour in grid.GetNeighbours(currentNode)){
-                if (neighbour.isObstacle || neighbour.isHidden || closedSet.Contains(neighbour)){
+                if (neighbour.isObstacle || closedSet.Contains(neighbour)){
                     continue;
                 }
 
@@ -133,6 +217,30 @@ public class Seek : MonoBehaviour
         grid.path = path;
     }
 
+    private bool CheckForHidden(){
+
+        // Put a sphere net around the seeker to sense hidden players
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 10f);
+        foreach(var c in colliders){
+
+            // If a hidden player is near, raycast towards it to see if it's blocked by a wall or if its in line of sight
+            if (c.gameObject.tag == "Hidden"){
+                RaycastHit hit;
+                Vector3 direction = (c.transform.position - transform.position).normalized;
+                if (Physics.Raycast(transform.position, direction, out hit)){
+                    if (hit.transform.gameObject.tag == "Hidden"){
+                        Debug.Log("Found a hidden player.");
+                        return true;
+                    } else {
+                        //Debug.Log("Hidden player is near, but I can't see it.");
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     private Vector3 SetDestination(GameObject plane){
         // Get a random point on the floor as a destination
         MeshCollider planeCollider = plane.GetComponent<MeshCollider>();
@@ -144,7 +252,11 @@ public class Seek : MonoBehaviour
         return randomPoint;
     }
 
-    IEnumerator MoveToDestination(List<Node> _path){
+    private Vector3 ChaseDestination(Vector3 hiddenPlayer){
+        return new Vector3(hiddenPlayer.x, hiddenPlayer.y, hiddenPlayer.z);
+    }
+
+    IEnumerator MoveToDestination(List<Node> _path, SeekerState state){
         // Face and move towards point
         float maxTimer = 10.0f;
         float twoSeconds = 0.0f;
@@ -161,34 +273,30 @@ public class Seek : MonoBehaviour
                 yield return null;
             }
 
-            // look around when we reach the last node
-            while (n == lastNode){
-                // Initalize finding a random angle to check
-                if (init)
-                    init = CheckAround(init);
-                else
-                    CheckAround(init);
+            if (state == SeekerState.Wander){
+                // look around when we reach the last node
+                while (n == lastNode){
+                    // Initalize finding a random angle to check
+                    if (init)
+                        init = CheckAround(init);
+                    else
+                        CheckAround(init);
 
-                timer += Time.deltaTime;
-                // After 10 seconds, go to a new destination
-                if (timer > maxTimer){
-                    checkingDone = true;
-                    
-                // Look around every 2 seconds
-                } else if (Mathf.Floor(timer) % 2.0f != twoSeconds){
-                    init = true;
+                    timer += Time.deltaTime;
+                    // After 10 seconds, go to a new destination
+                    if (timer > maxTimer){
+                        checkingDone = true;
+                        
+                    // Look around every 2 seconds
+                    } else if (Mathf.Floor(timer) % 2.0f != twoSeconds){
+                        init = true;
+                    }
+                    yield return null;
                 }
-                yield return null;
             }
-        }
-    }
-
-    private bool CheckPosition(Vector3 point){
-        // If at destination, send true, else false
-        if (transform.position == point)
-            return true;
-        else{
-            return false;
+            if (hide){
+                atSpot = true;
+            }
         }
     }
 
@@ -201,5 +309,21 @@ public class Seek : MonoBehaviour
             transform.rotation = Quaternion.Lerp(transform.rotation, desiredRotation, 5f * Time.deltaTime);
         }
         return false;
+    }
+
+    private void OnTriggerEnter(Collider o){
+        if (o.GetComponent<Collider>().tag == "Hidden"){
+            Debug.Log("Tagged a hidden player. Time to hide!");
+            if (moving){
+                StopCoroutine(movement);
+                targetPosition = o.transform.position;
+                hide = true;
+            }
+        }
+    }
+
+    private void OnDrawGizmos(){
+        Gizmos.color = Color.white;
+        Gizmos.DrawWireSphere(transform.position, 10f);
     }
 }

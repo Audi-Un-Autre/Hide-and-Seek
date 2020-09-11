@@ -5,7 +5,7 @@ using UnityEngine;
 public class Grid : MonoBehaviour{
 
     public GameObject plane;
-    public LayerMask ObstacleMask, HiddenMask;
+    public LayerMask ObstacleMask;
     [SerializeField] Vector3 gridSize;
     [SerializeField] float nodeRadius;
     Node[,] grid;
@@ -38,8 +38,7 @@ public class Grid : MonoBehaviour{
                 // Point on grid that represents a 'node'. From the bottom left of the grid we move 1 unit to the right per loop and then 1 unit up after hitting x limit.
                 Vector3 worldPoint = gridBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (z * nodeDiameter + nodeRadius);
                 bool isObstacle = Physics.CheckSphere(worldPoint, nodeRadius, ObstacleMask);
-                bool isHidden = Physics.CheckSphere(worldPoint, nodeRadius, HiddenMask);
-                grid[x,z] = new Node(isObstacle, isHidden, worldPoint, x, z);
+                grid[x,z] = new Node(isObstacle, worldPoint, x, z);
             }
         }
     }
@@ -85,7 +84,7 @@ public class Grid : MonoBehaviour{
         Gizmos.DrawWireCube(transform.position, new Vector3(gridSize.x, 1, gridSize.z));
         if (grid != null){
             foreach (Node n in grid){
-                Gizmos.color = n.isObstacle?Color.red:Color.white;
+                Gizmos.color = (n.isObstacle)?Color.red:Color.white;
                 if (path != null)
                     if (path.Contains(n))
                         Gizmos.color = Color.black;
