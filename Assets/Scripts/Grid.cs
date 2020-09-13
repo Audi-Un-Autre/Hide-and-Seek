@@ -6,12 +6,13 @@ public class Grid : MonoBehaviour{
 
     public GameObject plane;
     public LayerMask ObstacleMask;
+    
+    private Node[,] grid;
+    private int gridX, gridZ;
+    
+    [SerializeField] float nodeDiameter;
     [SerializeField] Vector3 gridSize;
     [SerializeField] float nodeRadius;
-    Node[,] grid;
-
-    [SerializeField] float nodeDiameter;
-    int gridX, gridZ;
 
     void Start(){
         gridSize = plane.GetComponent<MeshCollider>().bounds.size;
@@ -21,10 +22,6 @@ public class Grid : MonoBehaviour{
         gridX = Mathf.RoundToInt(gridSize.x / nodeDiameter);
         gridZ = Mathf.RoundToInt(gridSize.z / nodeDiameter);
         CreateGrid();
-    }
-
-    void Update(){
-        
     }
 
     public void CreateGrid(){
@@ -80,6 +77,7 @@ public class Grid : MonoBehaviour{
 
     public List<Node> path;
      //VISUAL DEBUGGING
+     /*
     private void OnDrawGizmos(){
         Gizmos.DrawWireCube(transform.position, new Vector3(gridSize.x, 1, gridSize.z));
         if (grid != null){
@@ -91,5 +89,5 @@ public class Grid : MonoBehaviour{
                 Gizmos.DrawCube(n.worldPosition, Vector3.one * (nodeDiameter - .1f));
             }
         }
-    }
+    }*/
 }

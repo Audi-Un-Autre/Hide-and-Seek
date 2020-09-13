@@ -1336,7 +1336,6 @@ GameObject:
   - component: {fileID: 1394524336}
   - component: {fileID: 1394524337}
   - component: {fileID: 1394524334}
-  - component: {fileID: 1394524338}
   m_Layer: 0
   m_Name: Seeker
   m_TagString: Untagged
@@ -1412,7 +1411,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1394524329}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.77, y: 0.4, z: -2.21}
+  m_LocalPosition: {x: 0.58, y: 0.4, z: -2.44}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1452,16 +1451,20 @@ MonoBehaviour:
   floor: {fileID: 884212490}
   moveSpeed: 2
   rotSpeed: 3
+  moving: 0
+  hide: 0
+  _currentState: 0
   destination: {x: 0, y: 0, z: 0}
   destinationSet: 0
   pathfinding: 0
   checkingDone: 0
   atSpot: 0
-  moving: 0
-  hide: 0
+  wait: 0
   timer: 0
+  waitTimer: 0
   randomAngle: 0
   targetPosition: {x: 0, y: 0, z: 0}
+  seeDistance: 7
 --- !u!108 &1394524336
 Light:
   m_ObjectHideFlags: 0
@@ -1566,18 +1569,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1394524338
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1394524329}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d402887fa8cf7c4419ea1ed9dd46244c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1487739776
 GameObject:
   m_ObjectHideFlags: 0
@@ -1718,9 +1709,9 @@ MonoBehaviour:
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 256
+  nodeDiameter: 0
   gridSize: {x: 0, y: 0, z: 0}
   nodeRadius: 0
-  nodeDiameter: 0
 --- !u!1 &1627371369
 GameObject:
   m_ObjectHideFlags: 0

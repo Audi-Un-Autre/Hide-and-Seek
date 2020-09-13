@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Seek : MonoBehaviour
 {
-    public enum SeekerState{Wander, Chase, Hide}
+    public enum SeekerState{Wait, Wander, Chase, Hide}
     public Material mSeek, mHide;
     public Grid grid;
     public GameObject floor;
@@ -12,38 +12,66 @@ public class Seek : MonoBehaviour
     public bool moving, hide;
     public List<Node> path = new List<Node>();
     public Coroutine movement;
-
-    private SeekerState _currentState;
+    public SeekerState _currentState;
+    
     private Plane[] geoPlanes;
     private Vector3 hiddenDestination;
 
     [SerializeField] Vector3 destination;
-    [SerializeField] bool destinationSet, pathfinding, checkingDone, atSpot;
+    [SerializeField] bool destinationSet, pathfinding, checkingDone, atSpot, wait;
     [SerializeField] float timer;
+    [SerializeField] float waitTimer = 0f;
     [SerializeField] float randomAngle = 0f;
     [SerializeField] Vector3 targetPosition;
+    [SerializeField] float seeDistance = 7f;
 
     void Start(){
         // Stay in Scene View
         UnityEditor.SceneView.FocusWindowIfItsOpen(typeof(UnityEditor.SceneView));
 
+        floor = GameObject.Find("Floor");
+        grid = GameObject.Find("Layout").GetComponent<Grid>();
+        mSeek = Resources.Load<Material>("Materials/seekerMaterial");
+        mHide = Resources.Load<Material>("Materials/hiderMaterial");
+        gameObject.tag = "Untagged";
+        gameObject.name = "Seeker";
+
         // Set initial destination for Gizmos
         destination = SetDestination(floor);
         destinationSet = false;
-        checkingDone = false;
-        moving = true;
-        hide = false;
+        wait = true;
 
+        // this gameobject will have the seeker color at start
         gameObject.GetComponent<Renderer>().material.color = mSeek.color;
     }
 
     void Update(){
         // Basic State Machine
         switch(_currentState){
+
+            // In this state, seeker will wait 10 seconds before looking for hidden players, this state only happens once in the life of a seeker
+            case SeekerState.Wait:{
+                if (wait){
+                    float maxWait = 5f;
+                    waitTimer += Time.deltaTime;
+                    Debug.Log("Time to start: " + Mathf.Floor(waitTimer));
+                    if (waitTimer >= maxWait){
+                        wait = false;
+                        gameObject.AddComponent<SeekerCollision>();
+                        _currentState = SeekerState.Wander;
+                    }
+                }
+                break;
+            }
+
+            // In this state, seeker will move to random spots
             case SeekerState.Wander:{
                 Debug.Log("CURRENT STATE : WANDER.");
+
+                // Check for hidden player
                 if (CheckForHidden()){
-                    StopCoroutine(movement);
+                    if (moving)
+                        StopCoroutine(movement);
                     pathfinding = true;
                     destinationSet = false;
                     moving = false;
@@ -110,6 +138,10 @@ public class Seek : MonoBehaviour
                         movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
                         moving = true;
                     }
+
+                    if (moving){
+                        Debug.DrawRay(transform.position, (targetPosition - transform.position).normalized * Vector3.Distance(transform.position, targetPosition), Color.green);
+                    }
                 }
                 break;
             }
@@ -145,6 +177,8 @@ public class Seek : MonoBehaviour
 
                 if (atSpot){
                     gameObject.GetComponent<Renderer>().material.color = mHide.color;
+                    gameObject.tag = "Hidden";
+                    gameObject.name = "Hider";
                     Destroy(GetComponent<Seek>());
                 }
 
@@ -224,7 +258,7 @@ public class Seek : MonoBehaviour
     private bool CheckForHidden(){
 
         // Put a sphere net around the seeker to sense hidden players
-        Collider[] colliders = Physics.OverlapSphere(transform.position, 10f);
+        Collider[] colliders = Physics.OverlapSphere(transform.position, seeDistance);
         foreach(var c in colliders){
 
             // If a hidden player is near, raycast towards it to see if it's blocked by a wall or if its in line of sight
@@ -237,7 +271,7 @@ public class Seek : MonoBehaviour
                         Debug.Log("Found a hidden player.");
                         return true;
                     } else {
-                        //Debug.Log("Hidden player is near, but I can't see it.");
+                        Debug.Log("Hidden player is near, but I can't see it.");
                         return false;
                     }
                 }
@@ -318,6 +352,6 @@ public class Seek : MonoBehaviour
     // OVERLAYSPHERE VISUAL DEBUGGING
     private void OnDrawGizmos(){
         Gizmos.color = Color.white;
-        Gizmos.DrawWireSphere(transform.position, 10f);
+        Gizmos.DrawWireSphere(transform.position, seeDistance);
     }
 }

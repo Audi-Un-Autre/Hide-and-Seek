@@ -15,9 +15,10 @@ public class SeekerCollision : MonoBehaviour{
             Debug.Log("Tagged a hidden player. Time to hide!");
             if (seekScript.moving){
                 StopCoroutine(seekScript.movement);
-                seekScript.hide = true;
-                Destroy(GetComponent<SeekerCollision>());
             }
+            o.gameObject.AddComponent<Seek>();
+            seekScript.hide = true;
+            Destroy(GetComponent<SeekerCollision>());
         }
     }
 }
