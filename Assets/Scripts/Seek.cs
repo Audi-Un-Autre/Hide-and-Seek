@@ -13,7 +13,7 @@ public class Seek : MonoBehaviour
     public List<Node> path = new List<Node>();
     public Coroutine movement;
     public SeekerState _currentState;
-    
+
     private Plane[] geoPlanes;
     private Vector3 hiddenDestination;
 
@@ -35,6 +35,15 @@ public class Seek : MonoBehaviour
         mHide = Resources.Load<Material>("Materials/hiderMaterial");
         gameObject.tag = "Untagged";
         gameObject.name = "Seeker";
+
+        gameObject.AddComponent<Light>();
+        Light light = GetComponent<Light>(); 
+        light.type = LightType.Spot;
+        light.range = 10;
+        light.spotAngle = 100;
+        light.color = Color.blue;
+        light.intensity = 7;
+        
 
         // Set initial destination for Gizmos
         destination = SetDestination(floor);

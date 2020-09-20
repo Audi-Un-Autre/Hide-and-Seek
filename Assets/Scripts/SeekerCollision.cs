@@ -19,6 +19,7 @@ public class SeekerCollision : MonoBehaviour{
             o.gameObject.AddComponent<Seek>();
             seekScript.hide = true;
             Destroy(GetComponent<SeekerCollision>());
+            Destroy(GetComponent<Light>());
         }
     }
 }
