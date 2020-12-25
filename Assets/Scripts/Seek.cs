@@ -92,33 +92,15 @@ public class Seek : MonoBehaviour
                     if (!destinationSet){
                         timer = 0.0f;
                         destination = SetDestination(floor);
-                        Node tempDestination = grid.PointOnGrid(destination);
-                        if (tempDestination.isObstacle){
-                            destination = SetDestination(floor);
-                        }
-                        else{
+                        if (Pathfind(transform.position, destination)){
                             destinationSet = true;
-                            pathfinding = true;
+                            movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
                         }
-                    }
-
-                    // Pathfind to destination
-                    if (pathfinding){
-                        pathfinding = Pathfind(transform.position, destination);
-                        if (!pathfinding)
-                            moving = false;
-                    }
-
-                    // Trace path made
-                    if (!moving){
-                        movement = StartCoroutine(MoveToDestination(grid.path, _currentState));
-                        moving = true;
                     }
                     
                     // At last node of path and finished checking around, reset all bools and start new destination
                     if (checkingDone){
                         StopCoroutine(movement);
-                        pathfinding = false;
                         destinationSet = false;
                         checkingDone = false;
                     }
@@ -217,7 +199,7 @@ public class Seek : MonoBehaviour
 
             if (currentNode == endNode){
                 CreatePath(startNode, endNode);
-                return false;
+                return true;
             }
             
             foreach (Node neighbour in grid.GetNeighbours(currentNode)){
@@ -237,8 +219,7 @@ public class Seek : MonoBehaviour
                 }
             }
         }
-        Debug.Log("FATAL ERROR: Destination is an obstacle.");
-        return true;
+        return false;
     }
 
     private int GetDistance(Node nodeA, Node nodeB){
